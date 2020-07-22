@@ -1,0 +1,164 @@
+{% assign show_breadcrumbs = true %}
+
+{% if show_breadcrumbs %}
+  {% include 'advanced-tag-loop' %}
+
+  {%- capture delimiter -%}
+    <span class="breadcrumbs-delimiter" aria-hidden="true">
+      {% include 'icon-chevron-down-thin' %}
+    </span>
+  {%- endcapture -%}
+  
+  <nav
+    class="breadcrumbs-container"
+    aria-label="{{ 'general.accessibility.nav_breadcrumbs' | t }}"
+  >
+    <a href="/">{{ 'general.breadcrumbs.home' | t }}</a>
+    
+    {% if template contains 'page' %}
+
+      {{ delimiter }}
+      <span>{{ page.title }}</span>
+
+    {% elsif template contains 'product' %}
+
+    
+    {% if collection.url %}
+     
+      {% assign title_array = collection.title | split : '_' %}
+   
+      {% assign series_type = collection.title | split : '_' | first %}
+    
+      {% assign replace_string = series_type | append: "_" %}
+    
+      {% assign collection_name = collection.title | replace_first: replace_string, "" %}
+     
+      {% capture collection_div_url %}/collections/{{- series_type | handle -}}{% endcapture %}
+      
+
+      {% if title_array.size > 1 %}
+            {{ delimiter }}{{ series_type | link_to: collection_div_url }}
+            {{ delimiter }}{{ collection_name | link_to: collection.url }}
+      {% else %}
+            {{ delimiter }}{{ series_type | link_to: collection.url }}
+      {% endif %}
+    {% endif %}
+    <span>{{ delimiter }}{{- product.title -}}</span>
+
+    
+    {% elsif template contains 'list-collections' %}
+
+      {{ delimiter }}
+      <span>{{ 'general.breadcrumbs.collections' | t }}</span>
+
+    {% elsif template contains 'collection' and collection.handle %}
+      
+      {% assign title_array = collection.title | split : '_' %}
+   
+      {% assign series_type = collection.title | split : '_' | first %}
+    
+      {% assign replace_string = series_type | append: "_" %}
+    
+      {% assign collection_name = collection.title | replace_first: replace_string, "" %}
+     
+      {% capture collection_url %}/collections/{{ series_type | handle }}{% endcapture %}
+      
+      {% capture level2_collection_url %}/collections/{{ collection.title | handle }}{% endcapture %}
+      
+    
+      {% if title_array.size > 1 %}
+            {{ delimiter }}{{ series_type | link_to: collection_url }}
+            {% if current_tags %}
+            <span>{{ delimiter }}{{- collection_name | link_to: level2_collection_url -}}</span>
+            {% else %}
+            <span>{{ delimiter }}{{- collection_name -}}</span>
+            {% endif %}
+      {% else %}
+            {% if current_tags %}
+    			{% if series_type == "Products" %}
+    			<span>{{ delimiter }}{{- series_type | link_to: collection.url -}}</span>
+    			{% else %}
+            	<span>{{ delimiter }}{{- series_type | link_to: collection_url -}}</span>
+    			{% endif %}
+            {% else %}
+            <span>{{ delimiter }}{{ series_type }}</span>
+            {% endif %}
+      {% endif %}
+      
+      {% if current_tags contains "resourcesAvailable_Yes" %}
+        {{ delimiter }}
+        <span> Classroom Resources</span>
+      
+      {% else %}
+        
+        {% for tag in current_tags %}
+          {{ delimiter }}
+          {% assign is_advanced_tag = false %}
+          {% assign cat = tag | split: '_' | first %}
+          {% unless cat == tag %}
+            {% if cat_array contains cat %}
+              {% assign is_advanced_tag = true %}
+              <span class="breadcrumbs-tag">
+                {{ tag | remove_first: cat | remove_first: '_' }}
+              </span>
+            {% endif %}
+          {% endunless %}
+
+          {% unless is_advanced_tag %}
+            {% assign tag_array = tag | split : '_' %}
+            <span class="breadcrumbs-tag">{{ tag_array[1] }}</span>
+          {% endunless %}
+
+        {% endfor %}
+      
+        
+      {% endif %}
+
+    {% elsif template == 'blog' %}
+
+      {{ delimiter }}
+      {% if current_tags %}
+        {{ blog.title | link_to: blog.url }}
+        {{ delimiter }}
+        <span>{{ current_tags | join: " + " }}</span>
+      {% else %}
+      <span>{{ blog.title }}</span>
+      {% endif %}
+
+    {% elsif template == 'article' %}
+
+      {{ delimiter }}
+      {{ blog.title | link_to: blog.url }}
+      {{ delimiter }}
+      <span>{{ article.title }}</span>
+
+    {% elsif template contains 'search' and search.performed %}
+      {%
+        include 'search-sanitizer',
+        search_terms: search.terms
+      %}
+
+      {{ delimiter }}
+    <span>Showing  results for <b>"{{ search.terms }}"</b></span>
+
+    {% elsif template == 'customers/account' %}
+
+    {{ delimiter }}
+    <span>{{ 'customers.account.title' | t }}</span>
+    
+    {% elsif template == 'customers/addresses' %}
+    
+    
+    {{ delimiter }}
+    <a href="/account">{{ 'customers.account.title' | t }}</a>
+    {{ delimiter }}
+    <span>{{ 'customers.addresses.title' | t }}</span>
+    
+    {% else %}
+
+      {{ delimiter }}
+       <span>{{ page_title }}</span>
+
+    {% endif %}
+  </nav>
+{% endif %}

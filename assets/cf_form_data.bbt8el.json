@@ -1,0 +1,357 @@
+{
+  "form": {
+    "id": "bbt8el",
+    "name": "Registration",
+    "handle": "registration-420",
+    "theme_id": "103872954534",
+    "settings": {
+      "locales": {
+        "back": "Back",
+        "next": "Next",
+        "cancel": "Cancel",
+        "edit_link": "Edit account",
+        "fix_errors": "Please fix errors before continuing",
+        "is_invalid": "{{label}} is invalid",
+        "email_taken": "Email has already been taken",
+        "phone_taken": "Phone number has already been taken",
+        "step_counter": "Step {{current}} of {{total}}",
+        "verify_email": "Check your email for a verification link to activate your account.",
+        "not_available": "An error occurred while saving your account, please try again in a few minutes.",
+        "create_account": "Create account",
+        "update_account": "Update account",
+        "recaptcha_error": "Challenge verification failed, please try again",
+        "creating_account": "Creating account...",
+        "updating_account": "Updating account...",
+        "invalid_email_domain": "Email contains an invalid domain name"
+      },
+      "enableRecaptcha": false,
+      "whitelistedTags": "",
+      "recaptchaSiteKey": "",
+      "markRequiredFields": true,
+      "displayCancelButton": true,
+      "goBackAfterSubmission": false,
+      "cancelButtonRedirectUrl": "\/account\/login",
+      "postSubmissionRedirectUrl": "\/account",
+      "goBackAfterCancelButtonClick": false
+    },
+    "install_locations": [
+      "register"
+    ],
+    "customers_count": 2,
+    "customers_today_count": 2,
+    "created_at": "2020-07-01T07:55:39Z",
+    "updated_at": "2020-07-01T12:42:01Z",
+    "revision_ids": [
+      "gyTVB1",
+      "xMT2Mb",
+      "xMT2Va",
+      "kdTDav",
+      "znT51N",
+      "7kTVre",
+      "9pT4eR",
+      "1wTblD",
+      "MDTb4M",
+      "DRTKZR"
+    ]
+  },
+  "revision": {
+    "id": "gyTVB1",
+    "created_at": "2020-07-01T12:31:33Z",
+    "embed_version": "3.3.3",
+    "published_at": "2020-07-01T12:42:02Z",
+    "fields": [
+      {
+        "id": 179878,
+        "dataColumn": {
+          "key": "title",
+          "label": "Title",
+          "dataType": "text"
+        },
+        "parentId": null,
+        "position": 0,
+        "type": "dropdown",
+        "stepId": 159904,
+        "default": "",
+        "label": "Title",
+        "placeholder": "Select",
+        "description": "",
+        "enum": [
+          {
+            "label": "Mr",
+            "value": "Mr"
+          },
+          {
+            "label": "Ms",
+            "value": "Ms"
+          },
+          {
+            "label": "Mrs",
+            "value": "Mrs"
+          }
+        ],
+        "appearance": {
+          "width": 12
+        },
+        "settings": {
+          "end": 10,
+          "start": 1,
+          "enumType": "list",
+          "separateValues": false
+        },
+        "validations": [
+          {
+            "metadata": {
+              "hiddenInApp": true
+            },
+            "operator": "not_blank",
+            "comparand": "",
+            "errorMessage": "Must not be blank"
+          }
+        ],
+        "sensitive": null,
+        "preset": null,
+        "autotag": null
+      },
+      {
+        "id": 159904,
+        "dataColumn": {
+          "key": "first_name",
+          "label": "First name",
+          "dataType": "text"
+        },
+        "parentId": null,
+        "position": 1,
+        "type": "text",
+        "stepId": 159904,
+        "default": "",
+        "label": "First name",
+        "placeholder": "",
+        "description": null,
+        "enum": null,
+        "appearance": {
+          "width": 12
+        },
+        "settings": {},
+        "validations": [
+          {
+            "metadata": {
+              "hiddenInApp": true
+            },
+            "operator": "not_blank",
+            "comparand": "",
+            "errorMessage": "Must not be blank"
+          }
+        ],
+        "sensitive": null,
+        "preset": "first_name",
+        "autotag": null
+      },
+      {
+        "id": 109349,
+        "dataColumn": {
+          "key": "last_name",
+          "label": "Last name",
+          "dataType": "text"
+        },
+        "parentId": null,
+        "position": 2,
+        "type": "text",
+        "stepId": 159904,
+        "default": "",
+        "label": "Last name",
+        "placeholder": "",
+        "description": null,
+        "enum": null,
+        "appearance": {
+          "width": 12
+        },
+        "settings": {},
+        "validations": [
+          {
+            "metadata": {
+              "hiddenInApp": true
+            },
+            "operator": "not_blank",
+            "comparand": "",
+            "errorMessage": "Must not be blank"
+          }
+        ],
+        "sensitive": null,
+        "preset": "last_name",
+        "autotag": null
+      },
+      {
+        "id": 587932,
+        "dataColumn": {
+          "key": "email",
+          "label": "Email address",
+          "dataType": "email"
+        },
+        "parentId": null,
+        "position": 3,
+        "type": "email",
+        "stepId": 159904,
+        "default": "",
+        "label": "Email address",
+        "placeholder": "",
+        "description": null,
+        "enum": null,
+        "appearance": {
+          "width": 12
+        },
+        "settings": {},
+        "validations": [
+          {
+            "operator": "is_valid_email",
+            "comparand": null,
+            "errorMessage": "Please provide a valid email address"
+          },
+          {
+            "metadata": {
+              "hiddenInApp": true
+            },
+            "operator": "not_blank",
+            "comparand": "",
+            "errorMessage": "Must not be blank"
+          }
+        ],
+        "sensitive": null,
+        "preset": "email_address",
+        "autotag": null
+      },
+      {
+        "id": 150571,
+        "dataColumn": {
+          "key": "phone",
+          "label": "Phone number",
+          "dataType": "phone"
+        },
+        "parentId": null,
+        "position": 4,
+        "type": "phone",
+        "stepId": 159904,
+        "default": "",
+        "label": "Phone number",
+        "placeholder": null,
+        "description": "",
+        "enum": [],
+        "appearance": {
+          "width": 12
+        },
+        "settings": {
+          "defaultCountryCode": "MX"
+        },
+        "validations": [],
+        "sensitive": null,
+        "preset": "phone_number",
+        "autotag": null
+      },
+      {
+        "id": 823739,
+        "dataColumn": {
+          "key": "password",
+          "label": "Password",
+          "dataType": "text"
+        },
+        "parentId": null,
+        "position": 5,
+        "type": "text",
+        "stepId": 159904,
+        "default": "",
+        "label": "Password",
+        "placeholder": "",
+        "description": null,
+        "enum": null,
+        "appearance": {
+          "width": 12
+        },
+        "settings": {},
+        "validations": [
+          {
+            "metadata": {
+              "hiddenInApp": true
+            },
+            "operator": "not_blank",
+            "comparand": "",
+            "errorMessage": "Must not be blank"
+          },
+          {
+            "metadata": {
+              "mandatory": true,
+              "staticOperator": true,
+              "comparandFieldProps": {
+                "min": 5
+              }
+            },
+            "operator": "longer_than",
+            "comparand": 5,
+            "errorMessage": "Password is too short"
+          }
+        ],
+        "sensitive": true,
+        "preset": "password",
+        "autotag": null
+      },
+      {
+        "id": 133276,
+        "dataColumn": {
+          "key": "password_confirmation",
+          "label": "Password confirmation",
+          "dataType": "text"
+        },
+        "parentId": null,
+        "position": 6,
+        "type": "password_confirmation",
+        "stepId": 159904,
+        "default": "",
+        "label": "Password confirmation",
+        "placeholder": null,
+        "description": "",
+        "enum": [],
+        "appearance": {
+          "width": 12
+        },
+        "settings": {
+          "passwordMatchErrorMessage": "Must match password"
+        },
+        "validations": [],
+        "sensitive": true,
+        "preset": "password_confirmation",
+        "autotag": null
+      },
+      {
+        "id": 112782,
+        "dataColumn": {
+          "key": "accepts_marketing",
+          "label": "Accepts marketing",
+          "dataType": "boolean"
+        },
+        "parentId": null,
+        "position": 7,
+        "type": "checkbox",
+        "stepId": 159904,
+        "default": "",
+        "label": "I wish to receive emails with news and classroom resources from Macmillan Mexico.",
+        "placeholder": null,
+        "description": "",
+        "enum": [],
+        "appearance": {
+          "width": 12
+        },
+        "settings": {},
+        "validations": [],
+        "sensitive": null,
+        "preset": "accepts_marketing",
+        "autotag": null
+      }
+    ],
+    "steps": [
+      {
+        "id": 159904,
+        "title": "Step 1",
+        "description": ""
+      }
+    ],
+    "rules": []
+  }
+}

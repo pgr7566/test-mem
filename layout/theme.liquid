@@ -1,0 +1,301 @@
+<!doctype html>
+<html class="no-js no-touch" lang="{{ shop.locale }}">
+  <head>
+{% assign mlveda_code_flag = false %}
+  
+  {% if mlveda_code_flag == true %}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.1/jquery.min.js"></script>
+    <script>
+      	$m = $.noConflict(true);
+	 window.pattern = /^(do|sv|ee|fi|fr|gd|gp|gg|hu|is|im|il|kz|ke|kg|la|mo|mk|mh|mq|ms|ma|nl|ne|ng|no|pw|py|pl|pt|kn|st|sc|sg|sk|za|sr|sj|th|to|tm|tc|uz|vu|vn|zm|af|al|as|ao|ai|an|ag|ar|as|bb|by|aq|bm|bq|bv|au|vg|bs|cv|bh|cf|bd|cn|be|co|ba|ci|bw|dk|bn|dm|bi|cd|cm|ec|ca|eg|td|gq|cx|er|cc|et|cr|eu|ga|gh|cy|gi|dj|gu|eu|gt|fk|gn|fo|gw|gf|hm|pf|hn|gm|iq|ge|ie|de|jm|gr|jp|in|ki|id|lr|je|mw|lv|my|ly|mu|li|yt|mv|mx|mc|mn|mz|nr|np|ni|nu|nf|pk|na|ph|oc|pn|om|qa|pg|re|pr|sh|ro|ru|rw|sm|bl|rs|pm|sx|vc|gs|sa|sd|sl|se|si|tj|tz|sb|tt|sa|tn|es|gb|lk|va|ch|zw|sy|tw|tl|tg|tr|um|vi|ug|us|uy|ve|af|ax|dz|ad|am|aw|at|az|bz|bj|bt|bo|br|io|bg|bf|kh|ky|cl|km|cg|ck|hr|cu|cw|cz|fj|tf|gl|gy|ht|hk|ir|it|jo|kw|lb|ls|lt|lu|mg|ml|mt|mr|fm|md|me|mm|na|nc|nz|kp|mp|ps|pa|pe|lc|mf|ws|sn|so|kr|ss|sz|tk|tv|ua|ae|wf|eh|ye|intl)$/;
+      </script>
+
+  {% endif %}
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="IE=edge">
+
+    <link rel="preconnect" href="https://cdn.shopify.com">
+    <link rel="preconnect" href="https://fonts.shopifycdn.com">
+    <link rel="preconnect" href="https://v.shopify.com">
+    <link rel="preconnect" href="https://cdn.shopifycloud.com">
+
+    <title>
+      {% if template contains "customers/login" %}
+        Login
+      {% elsif template contains "customers/account" %}
+        My Account
+      {% else %}
+        {{- page_title -}}
+     {% endif %}
+
+
+      {%- if current_tags -%}
+        {%- include 'advanced-tag-loop' -%}
+        {% assign title_tags = '' %}
+        {% assign meta_tags = current_tags | join: ', ' %}
+        {%- for tag in current_tags -%}
+          {% assign is_advanced_tag = false %}
+          {% assign cat = tag | split: '_' | first %}
+
+          {%- unless cat == tag -%}
+            {%- if cat_array contains cat -%}
+              {% assign is_advanced_tag = true %}
+              {% assign title_tags = title_tags | append: ', ' | append: tag | replace_first: '_', ': ' %}
+            {%- endif -%}
+          {%- endunless -%}
+
+          {%- unless is_advanced_tag -%}
+            {% assign title_tags = title_tags | append: ', ' | append: tag %}
+          {%- endunless -%}
+        {%- endfor -%}
+        {{ 'general.title.tags' | t: tags: title_tags | remove_first: ', ' }}
+      {%- endif -%}
+
+      {%- if current_page != 1 -%}
+        {{- 'general.title.page' | t: page: current_page -}}
+      {%- endif -%}
+
+      {%- unless page_title contains shop.name -%}
+        {{- 'general.title.shop' | t: shop: shop.name -}}
+      {%- endunless -%}
+    </title>
+
+    {% if page_description != blank %}
+      <meta name="description" content="{{ page_description | escape }}">
+    {% endif %}
+
+    {% include 'favicon' %}
+
+    {% if template contains 'collection' and current_tags %}
+   
+      <meta name="robots" content="noindex" />
+      <link rel="canonical" href="{{ shop.url }}{{ collection.url }}" />
+    {% else %}
+      <link rel="canonical" href="{{ canonical_url }}" />
+    {% endif %}
+
+    <meta name="viewport" content="width=device-width">
+
+    {% assign twitter_handle = settings.social_twitter | split: 'twitter.com/' | last %}
+    {%
+      include 'social-meta-tags',
+      twitter_handle: twitter_handle
+    %}
+
+    <link rel="preload" href="{{ settings.type_menu | font_url }}" as="font" crossorigin="anonymous">
+    <link rel="preload" as="style" href="{{ 'theme.css' | asset_url }}">
+
+    {{ content_for_header }}
+
+    {{ 'theme.css' | asset_url | stylesheet_tag }}
+    {{ 'ripple.css' | asset_url | stylesheet_tag }}
+    {{ 'dev.scss.css' | asset_url | stylesheet_tag }}
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.shopify.com/shopifycloud/shopify-plyr/v1.0/shopify-plyr.css">
+
+    {% comment %}theme-object{% endcomment %}
+    <script>
+      window.Theme = window.Theme || {};
+      window.Theme.routes = {
+        "root_url": "{{ routes.root_url }}",
+        "account_url": "{{ routes.account_url }}",
+        "account_login_url": "{{ routes.account_login_url }}",
+        "account_logout_url": "{{ routes.account_logout_url }}",
+        "account_register_url": "{{ routes.account_register_url }}",
+        "account_addresses_url": "{{ routes.account_addresses_url }}",
+        "collections_url": "{{ routes.collections_url }}",
+        "all_products_collection_url": "{{ routes.all_products_collection_url }}",
+        "search_url": "{{ routes.search_url }}",
+        "cart_url": "{{ routes.cart_url }}",
+        "cart_add_url": "{{ routes.cart_add_url }}",
+        "cart_change_url": "{{ routes.cart_change_url }}",
+        "cart_clear_url": "{{ routes.cart_clear_url }}",
+        "product_recommendations_url": "{{ routes.product_recommendations_url }}",
+      };
+    </script>
+  
+<!--begin-bc-sf-filter-css-->
+  {% include 'bc-sf-filter-style' %}
+<!--end-bc-sf-filter-css-->
+
+	{% include "head_scripts" %}
+{% if mlveda_code_flag == true %}
+  	{% if template != 'cart' %}
+		<script>
+		  $m("<style type='text/css'>span.money{ display: none; }</style>").appendTo("head");
+          
+          {% if template contains 'product' %}
+            $m("<style type='text/css'>button[name='add']{visibility : hidden;}</style>").appendTo("head");
+          {% endif %}
+          
+		</script>
+	{% endif %}
+  {% endif %}
+</head>
+
+  <body class="template-{{ template.name }}" data-instant-allow-query-string {% if settings.reduce_animations %}data-reduce-animations{% endif %}>
+    <script>
+      document.documentElement.className=document.documentElement.className.replace(/\bno-js\b/,'js');
+      if(window.Shopify&&window.Shopify.designMode)document.documentElement.className+=' in-theme-editor';
+      if(('ontouchstart' in window)||window.DocumentTouch&&document instanceof DocumentTouch)document.documentElement.className=document.documentElement.className.replace(/\bno-touch\b/,'has-touch');
+    </script>
+    <a class="skip-to-main" href="#site-main">{{ 'general.accessibility.skip_to_content' | t }}</a>
+    {% section 'static-announcement' %}
+    <header
+      class="site-header site-header-nav--open"
+      role="banner"
+      data-site-header
+    >
+      {% section 'static-header' %}
+    </header>
+    <div class="intersection-target" data-header-intersection-target></div>
+    <div class="site-main-dimmer" data-site-main-dimmer></div>
+    <main id="site-main" class="site-main" aria-label="Main content" tabindex="-1">
+      {% if template == 'index' %}
+        {% section 'static-slideshow' %}
+        {% section 'static-highlights-banners' %}
+      {% endif %}
+
+      {% if mlveda_code_flag == false %}
+          	{{ content_for_layout }}	
+          {% endif %}
+
+          {% if mlveda_code_flag == true %}
+          <div class="mlvedaform">
+            {{ content_for_layout }}
+            {% include 'mlveda-multipricing-options' %}
+          </div>
+          	{% include 'mlveda-multipricing-selectBox' %}
+
+          	{% include 'mlveda-multipricing-selectors' %}
+          {% endif %}
+    </main>
+
+    {% section 'static-footer' %}
+
+    {% comment %}
+      Below are various templates used in JavaScript
+    {% endcomment %}
+    <div style="display: none;" aria-hidden="true" data-templates>
+      {% include 'message-banner' %}
+      {% include 'atc-banner' %}
+    </div>
+
+    {% comment %}
+      Modal container, used on Collections, Password, and QuickShop
+    {% endcomment %}
+    {% include 'modal' %}
+
+    {% comment %}
+      This is the PhotoSwipe dialog which needs to be in the base page
+    {% endcomment %}
+    {% include 'product-gallery-zoom' %}
+
+    {%- if template contains 'customer' -%}
+      {{ 'shopify_common.js' | shopify_asset_url | script_tag }}
+      {{ 'customer_area.js' | shopify_asset_url | script_tag }}
+    {%- endif -%}
+
+    {% unless settings.reduce_animations %}
+      <script>
+        (
+          function () {
+            var classes = {
+              block: 'pxu-lia-block',
+              element: 'pxu-lia-element',
+            };
+
+            document
+              .querySelectorAll('[type="application/pxs-animation-mapping+json"]')
+              .forEach(function (mappingEl) {
+                const section = mappingEl.parentNode;
+                try {
+                  const mapping = JSON.parse(mappingEl.innerHTML);
+                  mapping.elements.forEach(function (elementSelector) {
+                    section
+                      .querySelectorAll(elementSelector)
+                      .forEach(function (element) { element.classList.add(classes.element); });
+                  });
+
+                  mapping.blocks.forEach(function (blockSelector) {
+                    section
+                      .querySelectorAll(blockSelector)
+                      .forEach(function (block) { block.classList.add(classes.block); });
+                  });
+                } catch (error) {
+                  console.warn('Unable to parse animation mapping', mappingEl, error);
+                }
+            });
+          }
+        )()
+      </script>
+    {% endunless %}
+
+    <script src="{{ 'vendors-main.bundle.js' | asset_url }}" ></script>
+
+    <script
+      src="{{ 'empire.js' | asset_url }}"
+      data-scripts
+      data-shopify-api-url="{{ 'api.jquery.js' | shopify_asset_url }}"
+      data-shopify-countries="/services/javascripts/countries.js"
+      data-shopify-common="{{ 'shopify_common.js' | shopify_asset_url }}"
+      data-shopify-cart="{{ 'jquery.cart.js' | asset_url }}"
+      data-pxu-polyfills="{{ 'polyfills.js' | asset_url }}"
+    >
+    </script>
+	<script src="{{ 'dev.js' | asset_url }}" ></script>
+    {% include 'structured-data' %}
+
+    <script>
+    (function () {
+      function handleFirstTab(e) {
+        if (e.keyCode === 9) { // the "I am a keyboard user" key
+          document.body.classList.add('user-is-tabbing');
+          window.removeEventListener('keydown', handleFirstTab);
+        }
+      }
+      window.addEventListener('keydown', handleFirstTab);
+    })();
+    </script>
+
+    <script
+      src="{{ 'instantPage.min.js' | asset_url }}"
+      type="module"
+      defer
+    >
+    </script>
+  
+<!--begin-bc-sf-filter-js-->
+  {% include 'bc-sf-filter' %}
+<!--end-bc-sf-filter-js-->
+{% if mlveda_code_flag == true %}
+  	{% if template != 'cart' %}
+		{% include 'mlveda-multipricing-updateprice' %}
+  	{% else %}
+        <script>mlvedaFlagCalled = true;</script>
+  	{% endif %}
+  {% else %}
+		<script>mlvedaFlagCalled = true;</script>
+  {% endif %}
+<!--BeginCFFPersistentCartCart-->
+{% if customer %}
+<script>
+
+    window.cffCustomer = {
+        name: '{{customer.name}}',
+        email: '{{customer.email}}',
+        hasAccount: '{{customer.has_account}}',
+        id: '{{customer.id}}'
+    };
+
+
+</script>
+
+{% endif %}
+
+<script>
+    window.cffPCLiquidPlaced = true
+</script>
+
+<!--EndCFFPersistentCartCart--></body>
+</html>

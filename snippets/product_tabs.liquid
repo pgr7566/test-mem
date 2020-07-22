@@ -1,0 +1,128 @@
+<div class="prod-desc-container product--container pdp-{{- handle -}}">
+  <div>
+    <ul class="pdptabs">
+      <li><a href="#tab-description" id="head-tab-1" class="head-tab-1 desctabs">About This Book</a></li>
+      {%- if product.metafields["global"]["resources"] != blank -%}
+      <li class="seriestabtitle"><a href="#tab-resource" id="head-tab-2" class="head-tab-2 desctabs ">Classroom Resources</a></li>
+      {%- endif -%}
+    </ul>
+    <div class="contenttabs">
+      <div class="accordianTitleDiv"><a href="#tab-description" id="accordion-head-tab-1" class="head-tab-1 desctabs accordiontitle">About This Book</a></div>
+      <div id="tab-description" class="head-tab-1 desctabstext desctab">
+        <div class="product-description rte prod-desc" data-product-description>
+          {{ product.description }}
+        </div>
+      </div>
+
+      {%- if product.metafields["global"]["resources"] != blank -%}
+      <div class="accordianTitleDiv"><a href="#tab-resource" id="accordion-head-tab-2" class="head-tab-2 desctabs accordiontitle">Resources</a></div>
+      <div id="tab-resource" class="head-tab-2 desctabstext seriestab">
+        <div class="product-description rte prod-desc" data-product-description>
+          <div class="seriesDesc">
+
+            {% assign isbn = current_variant.sku %}
+            {%- assign resources = product.metafields["global"]["resources"] | split: isbn -%}
+
+            {% unless customer %}
+            <span class="login_resource">You must be logged in to download this resource! <a href="/account/login?checkout_url={{ product.url }}#tab-resource">Login</a> or <a href="/account/register">register</a> before proceeding.</span>
+
+            {% endunless %}
+
+            <ul class="product_resources">
+            {% for resource in resources %}
+
+            {%- assign resource_meta = resource | prepend: isbn | split: "|" -%}
+
+            {%- assign resource_name = resource_meta[1] | split: "" | reverse | join: "" | remove_first: "," | split: "" | reverse | join: "" -%}
+            {%- assign resource_url = resource_meta[0] | strip | split: " ." | join: "." | replace: ' ', '_' | replace: ',', '_' | replace: "'", '_' | replace: "&", '_' | replace: "®", "_" -%}
+
+			{% unless forloop.index == 1 %}
+            {% if resource_name != blank %}
+              <li class="product_resource">
+                {% if customer %}
+                <a target="_blank" href="{{- resource_url | file_url -}}">{{- resource_name -}}</a>
+                {% else %}
+                <a href="/account/login?checkout_url={{ product.url }}">{{- resource_name -}}</a>
+                {% endif %}
+              </li>
+            {% else %}
+              <li class="product_resource">
+                {% if customer %}
+                <a target="_blank" href="{{- resource_url | file_url -}}">Classroom Resource {{ forloop.index | minus: 1 }}</a>
+                {% else %}
+                <a href="/account/login?checkout_url={{ product.url }}">Classroom Resource {{ forloop.index | minus: 1 }}</a>
+                {% endif %}
+              </li>
+            {% endif %}
+            {% endunless %}
+
+            {% endfor %}
+          </ul>
+          </div>
+        </div>
+      </div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+<script>
+$(function(){
+  var tab_index = window.location.hash.substr(1);
+
+  tabreset(tab_index);
+  $('ul.pdptabs li a').click(function(e){
+      e.preventDefault();
+      $('.desctabs').removeClass('active');
+      $('.desctabstext').removeClass('open');
+      $(this).addClass('active');
+      var currentTabId = $(this).attr('id');
+      $('div.'+currentTabId).addClass('open');
+  });
+  $('.modal-content ul.pdptabs li a').click(function(e){
+      e.preventDefault();
+      $('.modal-content .desctabs').removeClass('active');
+      $('.modal-content .desctabstext').removeClass('open');
+      $(this).addClass('active');
+      var currentTabId = $(this).attr('id');
+      $('.modal-content div.'+currentTabId).addClass('open');
+  });
+  $('.contenttabs .accordianTitleDiv a').click(function(e){
+      e.preventDefault();
+      var currentelement = $(this);
+      var currentTabIdTitle = $(this).attr('id');
+      $('.desctabstext').removeClass('open desctab');
+      $('.desctabstext').hide();
+      if($(currentelement).hasClass('active')){
+        $(currentelement).removeClass('active');
+      }else{
+        $('.desctabs').removeClass('active');
+        var currentTabId = currentTabIdTitle.replace('accordion-','');
+        $('div.'+currentTabId).slideToggle(100, function(){
+           $(currentelement).toggleClass('active', $(this).is(':visible'));
+        });
+      }
+  });
+})
+
+function tabreset(tab_index){
+
+  console.log(tab_index);
+
+  $('.desctabs').removeClass('active');
+  $('.desctabstext').removeClass('open');
+
+  var target = $('ul.pdptabs li a[href="#'+tab_index+'"]');
+  if($('ul.pdptabs li a[href="#'+tab_index+'"]').length > 0 ){
+    var ul_target = $('ul.pdptabs li a[href="#'+tab_index+'"]');
+    var des_target = $('.contenttabs #'+ tab_index +'');
+  }else{
+    var ul_target = $('ul.pdptabs li:first-child a');
+    var des_target = $('.contenttabs .desctabstext.desctab');
+  }
+
+  ul_target.addClass('active');
+
+	des_target.addClass('open');
+}
+</script>

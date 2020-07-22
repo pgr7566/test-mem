@@ -1,0 +1,335 @@
+
+<article class="site-page" data-template-page>
+  <header class="page-masthead">
+    <h1 class="page-title">
+      {{ page.title }}
+    </h1>
+  </header>
+
+
+  <div class="page-content rte">
+    <div class="page-content rte">
+      <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.6.0/papaparse.js"></script>
+      <style>
+      .page-content{max-width: 1000px}
+      </style>
+      <div style="text-align: center;">
+        <div style="border: 1px solid #ddd; margin-right: 15px; display: inline-block; padding: 20px; width: 60%">
+          <div style="border-bottom: 1px solid #ddd; padding-bottom: 15px;">
+            <input type="file" name="filename" id="filename" /> <button id="upload" class="button-primary">Upload from here</button>
+            <br>
+            <div class="checkbox_container">
+              <!-- <div style="border-bottom:1px solid #ccc;width:80%;margin:auto;">
+   <input type="checkbox" name="is_image_check" value="1"> Check ON to include First Image processing? <br><br>
+   <input type="checkbox" name="is_desc_needed" value="1"> Check ON to include Description processing? <br><br>
+   </div> -->
+              <!-- <div style="padding-top:20px">
+                <input type="checkbox" name="is_for_seo" value="1"> Check ON to process only for SEO data? <br><br>
+                <input type="checkbox" name="is_for_mydigital" value="1"> Check ON to process only for MyDigital link data? <br><br>
+                <input type="checkbox" name="is_only_desc_needed" value="1"> Check ON to process only for Description data? <br><br>
+                <input type="checkbox" name="is_only_price_needed" value="1"> Check ON to process only for AUD Price data? <br><br>
+                <input type="checkbox" name="is_only_multi_image_needed" value="1"> Check ON to process only Multiple Images? <br><br>
+
+              </div> -->
+            </div>
+          </div>
+          <!--<p class="">Download <a href="https://cdn.shopify.com/s/files/1/0246/8741/1266/files/sample.csv?2455" download="">Product Sample CSV template</a></p>-->
+          <!--<p class="leftAlign">Download <a href="https://cdn.shopify.com/s/files/1/0025/2608/5179/files/price.csv?6605431664811623456" download="">Price Sample CSV template</a></p>
+  <p class="leftAlign">Download <a href="https://cdn.shopify.com/s/files/1/0025/2608/5179/files/imageImp.csv?11524486652662420276" download="">Image Sample CSV template</a></p>
+  <p class="leftAlign"><a href="https://cdn.shopify.com/s/files/1/0025/2608/5179/files/import-utility-doc.html?14105842248389629381">Read CSV import documentation</a></p> -->
+        </div>
+        <div class="csv" style="margin-top: 20px;"></div>
+      </div>
+      <script type="text/javascript">
+        // <![CDATA[
+        let is_image_processing;
+        let is_desc_needed;
+        let is_for_seo;
+        let is_for_mydigital;
+        let is_only_desc_needed;
+        let is_only_price_needed;
+        let is_only_multi_image_needed;
+
+        $(document).ready(function() {
+
+          $('#filename').click(function() {
+            $('.csv').html('')
+          });
+
+          $('#upload').click(function() {
+
+            is_image_processing = $("input[name='is_image_check']").is(':checked');
+            is_desc_needed = $("input[name='is_desc_needed']").is(':checked');
+            is_for_seo = $("input[name='is_for_seo']").is(':checked');
+            is_for_mydigital = $("input[name='is_for_mydigital']").is(':checked');
+            is_only_desc_needed = $("input[name='is_only_desc_needed']").is(':checked');
+            is_only_price_needed = $("input[name='is_only_price_needed']").is(':checked');
+            is_only_multi_image_needed = $("input[name='is_only_multi_image_needed']").is(':checked');
+
+
+            var csv = $('#filename');
+            var csvFile = csv[0].files[0];
+            var ext = csv.val().split(".").pop().toLowerCase();
+
+            if ($.inArray(ext, ["csv"]) === -1) {
+              alert('upload csv');
+              return false;
+            }
+
+            if (csvFile != undefined) {
+              reader = new FileReader();
+              $('#upload').text("Processing...").attr("disabled", true);
+              $('.csv').html("");
+              reader.onload = function(e) {
+                processCSV(e.target.result, csvFile)
+              }
+              reader.readAsText(csvFile);
+            }
+          });
+        });
+
+        function processCSV(csvData, csvFile) {
+          var data = Papa.parse(csvData, {
+            header: true,
+            beforeFirstChunk: function(chunk) {
+              var rows = chunk.split(/\r\n|\r|\n/);
+              var headings = rows[0].toLowerCase();
+              rows[0] = headings;
+              return rows.join("\r\n");
+            },
+            complete: function(results, file) {
+              console.log("Parsing complete:", results, file);
+
+              if (results.data && results.data.length > 0) {
+
+                var data = results.data;
+                // now start creating the file for Shopify
+                create_shopify_file(data, csvFile);
+              }
+
+            },
+            error: function(errors, file) {
+              console.log("Parsing error:", errors, file);
+            }
+          });
+          return;
+
+        }
+
+        function create_shopify_file(data, csvFile) {
+          var totalRecords = data.length;
+          var noOfFiles = totalRecords / 800;
+          var recordsPerFile = 800;
+          var processedRecords = 0;
+          for (var k = 0; k < noOfFiles; k++) {
+            var newData = data.slice(k * recordsPerFile, (k * recordsPerFile) + recordsPerFile);
+            if (newData.slice(-1)[0]["isbn"] == "") {
+              totalRecords = totalRecords - 1;
+              newData.splice(-1);
+            }
+            var processedData = newData.map(function(data, i) {
+              
+              console.log(data);
+              
+              if(typeof data["main_category"] != "undefined"){
+              	var primary = data["main_category"].replace(/H27 PRIMARY CARIBBEAN/gi, "Primary");
+                
+                var secondary = primary.replace(/H47 SECONDARY CARIBBEAN/gi, "Secondary");
+                var main_category = secondary.replace(/H70 TRADE AND GENERAL Caribbean/gi, "Our General Titles");
+              }
+              
+
+              var request;
+              var perData = {
+                Handle: data["isbn"],
+                "Variant SKU": '="' + data["isbn"] + '"'
+              };
+
+              perData["Title"] = (data["title"] && data["title"] != "NULL") ? data["title"] : "";
+
+              perData["Body (HTML)"] = (data["long_description"] && data["long_description"] != "NULL") ? data["long_description"] : "";
+
+              perData["Variant Price"] = (data["price"] && data["price"] != "NULL") ? data["price"] : "";
+
+              perData["Variant Grams"] = (data["weight"] && data["weight"] != "NULL") ? data["weight"] : "";
+              
+              perData["Variant Requires Shipping"] = (data["weight"] && data["weight"] != "NULL") ? "TRUE" : "FALSE";
+
+              var caribbeanCountry = "";
+              if (data["caribbean_country"] && data["caribbean_country"] != "NULL") {
+                caribbeanCountry = data["caribbean_country"].split(",").map(function(country) {
+                  if (country)
+                    return "caribbeanCountry_" + country.trim();
+                });
+                caribbeanCountry = caribbeanCountry.join(",");
+              }
+
+              perData["caribbeanCountry"] = (data["caribbean_country"] && data["caribbean_country"] != "NULL") ? data["caribbean_country"] : "";
+
+              perData["mainCategory"] = (main_category && main_category != "NULL") ? main_category : "";
+
+              perData["level"] = (data["level"] && data["level"] != "NULL") ? data["level"] : "";
+
+              perData["subject"] = (data["subject"] && data["subject"] != "NULL") ? data["subject"] : "";
+
+              perData["subcategory3"] = (data["subcategory3"] && data["subcategory3"] != "NULL") ? data["subcategory3"] : "";
+
+              perData["series"] = (data["series"] && data["series"] != "NULL") ? data["series"] : "";
+
+              perData["author_1"] = (data["author_1"] && data["author_1"] != "NULL") ? data["author_1"] : "";
+              perData["author_2"] = (data["author_2"] && data["author_2"] != "NULL") ? data["author_2"] : "";
+              perData["author_3"] = (data["author_3"] && data["author_3"] != "NULL") ? data["author_3"] : "";
+              perData["author_4"] = (data["author_4"] && data["author_4"] != "NULL") ? data["author_4"] : "";
+              perData["author_5"] = (data["author_5"] && data["author_5"] != "NULL") ? data["author_5"] : "";
+              perData["author_6"] = (data["author_6"] && data["author_6"] != "NULL") ? data["author_6"] : "";
+              perData["author_7"] = (data["author_7"] && data["author_7"] != "NULL") ? data["author_7"] : "";
+              perData["author_8"] = (data["author_8"] && data["author_8"] != "NULL") ? data["author_8"] : "";
+              perData["author_9"] = (data["author_9"] && data["author_9"] != "NULL") ? data["author_9"] : "";
+
+              perData["publicationDate"] = (data["publication_date"] && data["publication_date"] != "NULL") ? data["publication_date"] : "";
+
+              perData["extent"] = (data["extent"] && data["extent"] != "NULL") ? data["extent"] : "";
+
+              perData["dimensions"] = (data["dimensions"] && data["dimensions"] != "NULL") ? data["dimensions"] : "";
+
+              perData["cxclink"] = (data["cxclink"] && data["cxclink"] != "NULL") ? data["cxclink"] : "";
+
+              perData["ebooklink"] = (data["ebooklink"] && data["ebooklink"] != "NULL") ? data["ebooklink"] : "";
+
+              perData["Published"] = (data["active"] == 1 && data["active"] != "NULL") ? true : false;
+
+              perData["recordType"] = (data["recordtype"] && data["recordtype"] != "NULL") ? data["recordtype"] : "";
+
+              perData["format"] = (data["format"] && data["format"] != "NULL") ? data["format"] : "";
+
+              let default_image = "https://cdn.shopify.com/s/files/1/0246/8741/1266/files/MEC_portraitlogo_holdingimage.jpg";
+              if(data["coverimage"]){
+                
+                //var cover_url = 'http://macmillaneducationcovers.com/Files/Success/' + data["isbn"] + '.jpg';
+                
+                //var cover_url = data["coverimage"];
+                //cover_url = cover_url.toLowerCase()
+                
+                var final_cover_img = data["coverimage"].toLowerCase().replace("www.", "").replace("WWW.", "");
+                
+                //var final_cover_img = cover_url;
+                
+                //if((cover_image != cover_url) && data["coverimage"] != "NULL" && data["coverimage"] != "" ){
+                if(data["coverimage"] == "NULL" && data["coverimage"] == "" ){
+                  
+                  final_cover_img = default_image;
+                  
+                  $(".csv").append("D: " + cover_url + ": B: " + cover_image + "<br>");
+                  
+                }
+                
+                perData["Image Src"] = (data["coverimage"] && data["coverimage"] != "NULL") ? final_cover_img : default_image;
+              }
+              else{
+                perData["Image Src"] = default_image;
+              }
+
+              perData["resources"] = (data["resources"] && data["resources"] != "NULL") ? data["resources"] : "";
+
+              var tags = "";
+
+              tags += (main_category && main_category != "NULL") ? "mainCategory_" + main_category + "," : '';
+              tags += (data["level"] && data["level"] != "NULL") ? "level_" + data["level"].replace(",", "") + "," : '';
+              tags += (data["subject"] && data["subject"] != "NULL") ? "subject_" + data["subject"].replace(",", "") + "," : '';
+              tags += (data["subcategory3"] && data["subcategory3"] != "NULL") ? "subcategory3_" + data["subcategory3"] + "," : '';
+              tags += (data["series"] && data["series"] != "NULL") ? "series_" + data["series"].replace(",", "") + "," : '';
+              tags += (data["author_1"] && data["author_1"] != "NULL") ? "author_" + data["author_1"] + "," : '';
+              tags += (data["author_2"] && data["author_2"] != "NULL") ? "author_" + data["author_2"] + "," : '';
+              tags += (data["author_3"] && data["author_3"] != "NULL") ? "author_" + data["author_3"] + "," : '';
+              tags += (data["author_4"] && data["author_4"] != "NULL") ? "author_" + data["author_4"] + "," : '';
+              tags += (data["author_5"] && data["author_5"] != "NULL") ? "author_" + data["author_5"] + "," : '';
+              tags += (data["author_6"] && data["author_6"] != "NULL") ? "author_" + data["author_6"] + "," : '';
+              tags += (data["author_7"] && data["author_7"] != "NULL") ? "author_" + data["author_7"] + "," : '';
+              tags += (data["author_8"] && data["author_8"] != "NULL") ? "author_" + data["author_8"] + "," : '';
+              tags += (data["author_9"] && data["author_9"] != "NULL") ? "author_" + data["author_9"] + "," : '';
+              tags += (data["recordtype"] && data["recordtype"] != "NULL") ? "recordType_" + data["recordtype"] + "," : '';
+//               tags += (data["isbn"] && data["isbn"] != "NULL") ? data["isbn"] + "," : '';
+              tags += (data["resources"] != "" && data["resources"] != "NULL") ? "resourcesAvailable_Yes" + "," : "resourcesAvailable_No" + ",";
+              tags += (data["format"] && data["format"] != "NULL") ? "format_" + data["format"] + "," : '';
+//               tags += (main_category) ? "mainCategory_" + main_category + "," : '';
+              tags += caribbeanCountry;
+
+
+              // remove comma from end of the tag string
+              if (tags.slice(-1) == ",") {
+                tags = tags.slice(0, -1);
+              }
+
+              perData['tags'] = tags;
+
+              // prepare data for resources
+              // var resources;
+              // if (data['resourcesavailable'] && data['resources'] != '') {
+              //   resources = data['resources'].split(',');
+              //
+              //   for (var i = 0; i < resources.length; i++) {
+              //
+              //     var resource_meta = resources[i].split("|");
+              //     perData['resource_' + i] = resources[i];
+              //
+              //   }
+              //
+              // }
+
+              //console.log(perData);
+
+              processedRecords++
+              return perData;
+            })
+
+            //return;
+            var importFileName = csvFile.name.substring(0, csvFile.name.lastIndexOf('.'));
+            var finalCsv = Papa.unparse(processedData);
+            $('#upload').text("Upload").attr("disabled", false);
+            downloadCSV(finalCsv, importFileName, k);
+            $('.csv').append('Total Records: ' + totalRecords + ', Processed Records: ' + processedRecords);
+          }
+        }
+
+        function downloadCSV(csv, importFileName, k) {
+
+          //console.log("CSV: " + csv);
+
+          var data, filename, link;
+          if (csv == null) return;
+
+          //filename = new Date().getTime()+'export.csv';
+          filename = importFileName + '_export_' + k + '.csv';
+
+          download(csv, filename, 'text/csv;encoding:utf-8');
+
+        }
+
+        var download = function(content, fileName, mimeType) {
+          var a = document.createElement('a');
+          mimeType = mimeType || 'application/octet-stream';
+
+          if (navigator.msSaveBlob) { // IE10
+            navigator.msSaveBlob(new Blob([content], {
+              type: mimeType
+            }), fileName);
+          } else if (URL && 'download' in a) { //html5 A[download]
+            a.href = URL.createObjectURL(new Blob([content], {
+              type: mimeType
+            }));
+            a.setAttribute('download', fileName);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          } else {
+            location.href = 'data:application/octet-stream,' + encodeURIComponent(content); // only this mime type is supported
+          }
+        }
+
+        // ]]>
+      </script>
+    </div>
+</div>
+
+</article>
