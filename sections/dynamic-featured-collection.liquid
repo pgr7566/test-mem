@@ -1,4 +1,5 @@
 {% assign selected_collection = collections[section.settings.collection] %}
+ {% assign collection = selected_collection %}
 {% assign product_count = section.settings.product_count %}
 {% assign layout = section.settings.layout %}
 
@@ -131,7 +132,7 @@
     </h2> 
   {% endif %}
  
-  {% assign collection = selected_collection %}
+ 
   
   <ul
     class="home-section--content featured-collection--content"
